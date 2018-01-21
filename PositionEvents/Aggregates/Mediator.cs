@@ -8,20 +8,19 @@ using PositionEvents.Utils;
 
 namespace PositionEvents.Aggregates
 {
-    public class Mediator<TAggregate, TState, TEvent>
+    public class Mediator<TAggregate, TState, TEvent> : IMediator<TEvent>
         where TAggregate : Aggregate<TState, TEvent>
         where TState : class, new()
-        where TEvent : IAggregateEvent
+        where TEvent : AggregateEvent
     {
-        private AggregateEventStore<TAggregate, TState, TEvent> events;
+        private EventStore<TAggregate, TState, TEvent> events;
 
 
         public Mediator(ITimeProvider timeProvider)
         {
-            events = new AggregateEventStore<TAggregate, TState, TEvent>(timeProvider);
+            events = new EventStore<TAggregate, TState, TEvent>(timeProvider);
         }
-
-
+        
         public void AddEvent(TEvent eventObj)
         {
             events.AddEvent(eventObj);
@@ -32,9 +31,14 @@ namespace PositionEvents.Aggregates
             events.AddEvent(eventObj, effective);
         }
 
-        public IEnumerable<AggregateEventLine<TEvent>> AllEvents()
+        public IEnumerable<EventLine<TEvent>> AllEvents()
         {
             return events.All();
+        }
+
+        public void Clear()
+        {
+            events.Clear();
         }
     }
 }

@@ -8,7 +8,7 @@ using PositionEvents.Specifications;
 
 namespace PositionEvents.Positions.Equities
 {
-    public class StockPurchased : IPositionEvent
+    public class StockPurchased : PositionEvent
     {
         public readonly Equity Equity;
         public readonly CurrencyAmount Price;

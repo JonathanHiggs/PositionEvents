@@ -1,15 +1,16 @@
-﻿using PositionEvents.Utils;
+﻿using PositionEvents.Aggregates;
+using PositionEvents.Utils;
 
 namespace PositionEvents.Positions.Bonds
 {
     public class BondCouponDetachedHandler : PositionEventHandler<BondCouponDetached>
     {
-        public BondCouponDetachedHandler(ITimeProvider timeProvider) 
-            : base(timeProvider)
+        public BondCouponDetachedHandler(ITimeProvider timeProvider, IMediator<PositionEvent> mediator)
+            : base(timeProvider, mediator)
         { }
 
 
-        public override void Apply(Positions position, BondCouponDetached positionEvent)
+        public override void Apply(PortfolioStore position, BondCouponDetached positionEvent)
         {
             var coupon = positionEvent.Coupon;
             var positionSize = position.Get(positionEvent.Bond);

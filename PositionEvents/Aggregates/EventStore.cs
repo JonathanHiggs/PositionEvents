@@ -9,16 +9,16 @@ using PositionEvents.Utils;
 
 namespace PositionEvents.Aggregates
 {
-    public class AggregateEventStore<TAggregate, TState, TEvent>
+    public class EventStore<TAggregate, TState, TEvent>
         where TAggregate : Aggregate<TState, TEvent>
         where TState : class, new()
-        where TEvent : IAggregateEvent
+        where TEvent : AggregateEvent
     {
         private ITimeProvider timeProvider;
-        private List<AggregateEventLine<TEvent>> events = new List<AggregateEventLine<TEvent>>();
+        private SortedList<EventLine<TEvent>, EventLine<TEvent>> events = new SortedList<EventLine<TEvent>, EventLine<TEvent>>(EventLineComparer<TEvent>.Default);
 
 
-        public AggregateEventStore(ITimeProvider timeProvider)
+        public EventStore(ITimeProvider timeProvider)
         {
             this.timeProvider = timeProvider;
         }
@@ -27,29 +27,35 @@ namespace PositionEvents.Aggregates
         public void AddEvent(TEvent aggregateEvent)
         {
             var now = timeProvider.CurrentInstant;
-            events.Add(new AggregateEventLine<TEvent>(
-                aggregateEvent, now, now));
+            var line = new EventLine<TEvent>(aggregateEvent, now, now);
+            events.Add(line, line);
         }
 
 
         public void AddEvent(TEvent aggregateEvent, Instant effective)
         {
             var now = timeProvider.CurrentInstant;
-            events.Add(new AggregateEventLine<TEvent>(
-                aggregateEvent, now, effective));
+            var line = new EventLine<TEvent>(aggregateEvent, now, effective);
+            events.Add(line, line);
         }
 
 
         public void AddEvent(TEvent aggregateEvent, Instant raised, Instant effective)
         {
-            events.Add(new AggregateEventLine<TEvent>(
-                aggregateEvent, raised, effective));
+            var line = new EventLine<TEvent>(aggregateEvent, raised, effective);
+            events.Add(line, line);
         }
 
 
-        public IEnumerable<AggregateEventLine<TEvent>> All()
+        public IEnumerable<EventLine<TEvent>> All()
         {
-            return events;
+            return events.Values;
+        }
+
+
+        public void Clear()
+        {
+            events.Clear();
         }
     }
 }

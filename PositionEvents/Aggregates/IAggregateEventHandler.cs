@@ -8,10 +8,10 @@ namespace PositionEvents.Aggregates
 {
     public interface IAggregateEventHandler<TAggregate, TState, TEvent>
         where TAggregate : Aggregate<TState, TEvent>
-        where TEvent : IAggregateEvent
+        where TEvent : AggregateEvent
         where TState : class, new()
     {
-        Mediator<TAggregate, TState, TEvent> Mediator { get; }
+        IMediator<TEvent> Mediator { get; }
 
         bool Validate(TState state, TEvent eventObj);
         void Apply(TState state, TEvent eventObj);

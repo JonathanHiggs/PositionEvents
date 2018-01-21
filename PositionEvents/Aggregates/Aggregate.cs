@@ -10,12 +10,12 @@ namespace PositionEvents.Aggregates
 {
     public abstract class Aggregate<TStore, TEvent> 
         where TStore : class, new()
-        where TEvent : IAggregateEvent
+        where TEvent : AggregateEvent
     {
-        private readonly AggregateEventStore<Aggregate<TStore, TEvent>, TStore, TEvent> eventStore = new AggregateEventStore<Aggregate<TStore, TEvent>, TStore, TEvent>(new TimeProvider());
+        private readonly EventStore<Aggregate<TStore, TEvent>, TStore, TEvent> eventStore = new EventStore<Aggregate<TStore, TEvent>, TStore, TEvent>(new TimeProvider());
         
 
-        public AggregateEventStore<Aggregate<TStore, TEvent>, TStore, TEvent> EventStore => eventStore;
+        public EventStore<Aggregate<TStore, TEvent>, TStore, TEvent> EventStore => eventStore;
 
         
         public TStore StateAt(Instant instant)
@@ -28,14 +28,15 @@ namespace PositionEvents.Aggregates
         {
             var state = new TStore();
             var timeProvider = new ControlledTimeProvider();
-            var eventQueue = new AggregateEventQueue<TEvent>(eventStore.All().Where(l => l.Raised <= instant));
+            var mediator = new Mediator<Aggregate<TStore, TEvent>, TStore, TEvent>(timeProvider);
+            var eventQueue = new EventQueue<TEvent>(eventStore.All().Where(l => l.Raised <= instant));
 
-            AggregateEventLine<TEvent> current;
+            EventLine<TEvent> current;
             while (eventQueue.TryPop(out current) && current.Effective <= forcast)
             {
                 timeProvider.SetInstant(current.Effective);
 
-                var handler = GetHandler(current.Event, timeProvider);
+                var handler = GetHandler(current.Event, timeProvider, mediator);
 
                 if (!handler.Validate(state, current.Event))
                     throw new InvalidOperationException();
@@ -43,13 +44,14 @@ namespace PositionEvents.Aggregates
                 handler.Apply(state, current.Event);
 
                 // Merge event stores
-                eventQueue.AddRange(handler.Mediator.AllEvents());
+                eventQueue.AddRange(mediator.AllEvents());
+                mediator.Clear();
             }
 
             return state;
         }
 
 
-        public abstract IAggregateEventHandler<Aggregate<TStore, TEvent>, TStore, TEvent> GetHandler(TEvent aggregateEvent, ITimeProvider timeProvider);
+        public abstract IAggregateEventHandler<Aggregate<TStore, TEvent>, TStore, TEvent> GetHandler(TEvent aggregateEvent, ITimeProvider timeProvider, IMediator<TEvent> mediator);
     }
 }

@@ -1,16 +1,17 @@
-﻿using PositionEvents.Instruments;
+﻿using PositionEvents.Aggregates;
+using PositionEvents.Instruments;
 using PositionEvents.Utils;
 
 namespace PositionEvents.Positions.Management
 {
     public class PositionCreatedHandler : PositionEventHandler<PositionCreated>
     {
-        public PositionCreatedHandler(ITimeProvider timeProvider) 
-            : base(timeProvider)
+        public PositionCreatedHandler(ITimeProvider timeProvider, IMediator<PositionEvent> mediator) 
+            : base(timeProvider, mediator)
         { }
 
 
-        public override void Apply(Positions position, PositionCreated positionEvent)
+        public override void Apply(PortfolioStore position, PositionCreated positionEvent)
         {
             position.Portfolio = positionEvent.Portfolio;
             position.Initialized = true;
@@ -18,7 +19,7 @@ namespace PositionEvents.Positions.Management
         }
 
 
-        public override bool Validate(Positions position, PositionCreated positionEvent)
+        public override bool Validate(PortfolioStore position, PositionCreated positionEvent)
         {
             return position.Initialized == false;
         }

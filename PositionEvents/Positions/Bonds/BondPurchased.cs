@@ -3,7 +3,7 @@ using PositionEvents.Specifications;
 
 namespace PositionEvents.Positions.Bonds
 {
-    public class BondPurchased : IPositionEvent
+    public class BondPurchased : PositionEvent
     {
         public readonly Bond PurchasedBond;
         public readonly BondDirtyPrice Price;

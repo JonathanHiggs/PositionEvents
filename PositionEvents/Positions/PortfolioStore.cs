@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,9 +11,10 @@ using PositionEvents.Specifications;
 
 namespace PositionEvents.Positions
 {
-    public class Positions
+    public class PortfolioStore
     {
         private Dictionary<IInstrument, PositionSize> contents = new Dictionary<IInstrument, PositionSize>();
+        private HashSet<TradeLine> trades = new HashSet<TradeLine>();
 
         public bool Initialized { get; set; } = false;
         public bool Closed { get; set; } = false;
@@ -21,6 +23,7 @@ namespace PositionEvents.Positions
 
 
         public IEnumerable<PositionLine> Lines => contents.Select(kvp => new PositionLine { Instrument = kvp.Key, Size = kvp.Value });
+        public ImmutableHashSet<TradeLine> Trades => trades.ToImmutableHashSet();
 
 
         public void Add(IInstrument instrument, double amount)
@@ -44,6 +47,11 @@ namespace PositionEvents.Positions
         public bool Any()
         {
             return contents.Any();
+        }
+
+        public void Add(TradeLine trade)
+        {
+            trades.Add(trade);
         }
         
         public bool Any(IInstrument instrument)

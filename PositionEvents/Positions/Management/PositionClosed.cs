@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PositionEvents.Aggregates;
 
 namespace PositionEvents.Positions.Management
 {
-    public class PositionClosed : IPositionEvent
-    { }
+    public class PositionClosed : PositionEvent
+    {
+        public PositionClosed()
+            : base(EventMetadata.LowPriority)
+        { }
+    }
 }

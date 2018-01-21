@@ -2,7 +2,7 @@
 
 namespace PositionEvents.Positions.Bonds
 {
-    public class BondMatured : IPositionEvent
+    public class BondMatured : PositionEvent
     {
         public readonly Bond Bond;
 

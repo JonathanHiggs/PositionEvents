@@ -3,26 +3,26 @@ using PositionEvents.Utils;
 
 namespace PositionEvents.Positions
 {
-    public abstract class PositionEventHandler<TEvent> : AggregateEventHandler<Aggregate<Positions, IPositionEvent>, Positions, IPositionEvent>
-        where TEvent : IPositionEvent
+    public abstract class PositionEventHandler<TEvent> : AggregateEventHandler<Aggregate<PortfolioStore, PositionEvent>, PortfolioStore, PositionEvent>
+        where TEvent : PositionEvent
     {
-        public PositionEventHandler(ITimeProvider timeProvider)
-            : base(timeProvider)
+        public PositionEventHandler(ITimeProvider timeProvider, IMediator<PositionEvent> mediator)
+            : base(timeProvider, mediator)
         { }
 
-        public override void Apply(Positions state, IPositionEvent eventObj)
+        public override void Apply(PortfolioStore state, PositionEvent eventObj)
         {
             Apply(state, (TEvent)eventObj);
         }
 
-        public override bool Validate(Positions state, IPositionEvent eventObj)
+        public override bool Validate(PortfolioStore state, PositionEvent eventObj)
         {
             return Validate(state, (TEvent)eventObj);
         }
 
-        public abstract void Apply(Positions position, TEvent positionEvent);
+        public abstract void Apply(PortfolioStore position, TEvent positionEvent);
 
-        public virtual bool Validate(Positions position, TEvent positionEvent)
+        public virtual bool Validate(PortfolioStore position, TEvent positionEvent)
         {
             return position.Initialized;
         }

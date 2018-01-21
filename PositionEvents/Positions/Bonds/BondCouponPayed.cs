@@ -2,7 +2,7 @@
 
 namespace PositionEvents.Positions.Bonds
 {
-    public class BondCouponPayed : IPositionEvent
+    public class BondCouponPayed : PositionEvent
     {
         public readonly Coupon Coupon;
         public readonly int Lots;

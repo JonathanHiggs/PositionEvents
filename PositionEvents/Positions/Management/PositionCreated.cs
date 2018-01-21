@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PositionEvents.Aggregates;
+﻿using PositionEvents.Aggregates;
 
 namespace PositionEvents.Positions.Management
 {
-    public class PositionCreated : IPositionEvent
+    public class PositionCreated : PositionEvent
     {
         public string Portfolio { get; private set; }
 
         public PositionCreated(string portfolio)
+            : base(EventMetadata.HighPriority)
         {
             Portfolio = portfolio;
         }
